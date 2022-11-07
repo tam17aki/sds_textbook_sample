@@ -1,52 +1,59 @@
-import os
-from google.cloud import texttospeech
+#!/usr/bin/env python3
 
+# Copyright (C) 2022 by Akira TAMAMORI
+
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation files
+# (the Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# Commentary:
+# gTTSによるテキスト音声合成のサンプルスクリプト
+
+from gtts import gTTS
 from pydub import AudioSegment
 from pydub.playback import play
 
-#
-# Google Text-to-Speechを用いて音声合成を行うクラス
-#
-class GoogleTextToSpeech(object):
 
-	def __init__(self, path_key='./google-credentials.json', language_code='ja-JP', tts_name='ja-JP-Wavenet-C', pitch=0.0):
-		
-		# APIのパラメータ
-		os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = path_key
+class GoogleTextToSpeech:
+    """Class for Text-to-Speech."""
 
-		# クライアントの初期化
-		self._client = texttospeech.TextToSpeechClient()
+    def __init__(self, lang: str = "ja", out_file: str = "/tmp/tts.mp3"):
+        """Initialize the class."""
+        self.lang = lang
+        self.out_file = out_file
 
-		# 音声合成のパラメータを設定
-		self._voice = texttospeech.VoiceSelectionParams(
-			language_code = language_code,
-			name = tts_name
-		)
+    def generate(self, text):
+        """Perform text-to-speech."""
+        tts = gTTS(text, lang=self.lang)
+        tts.save(self.out_file)  # save audio in mp3 format
 
-		# 音声の設定
-		self._audio_config = texttospeech.AudioConfig(
-			audio_encoding = texttospeech.AudioEncoding.MP3,
-			pitch = pitch
-		)
-	
-	# 音声合成
-	def generate(self, text, filename='./data/tts-temp.mp3'):
+    def play(self):
+        """Play synthesized speech."""
+        audio_data = AudioSegment.from_mp3(self.out_file)
+        play(audio_data)
 
-		# 音声合成を実行
-		synthesis_input = texttospeech.SynthesisInput(text=text)
-		response = self._client.synthesize_speech(input=synthesis_input, voice=self._voice, audio_config=self._audio_config)
 
-		# 合成したデータをmp3ファイルとして書き出し
-		with open(filename, 'wb') as out:
-			out.write(response.audio_content)
+def main(text: str = "こんにちは"):
+    """Perform Text-to-Speech."""
+    tts = GoogleTextToSpeech()
+    tts.generate(text)
+    tts.play()
 
-	# 合成音声の再生
-	def play(self, filename='./data/tts-temp.mp3'):
-		audio_data = AudioSegment.from_mp3(filename)
-		play(audio_data)
 
-if __name__ == '__main__':
-	
-	tts = GoogleTextToSpeech()
-	tts.generate('京都大学へようこそ。')
-	tts.play()
+if __name__ == "__main__":
+    main("こんにちは")
