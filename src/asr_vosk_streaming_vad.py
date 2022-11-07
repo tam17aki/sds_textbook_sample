@@ -192,15 +192,25 @@ def get_asr_result(vosk_asr):
         return None
 
 
-def get_vosk_recognizer():
+def get_vosk_recognizer(threshold=45, vad_start=0.3, vad_end=1.0):
     """Return VOSK-based recognizer."""
-    SetLogLevel(-1)
-    vad_config = VadConfig()
+    SetLogLevel(-1)  # VOSK起動時のログ表示を抑制
+
+    # 入力デバイス情報に基づき、サンプリング周波数の情報を取得
     input_device_info = sd.query_devices(kind="input")
     sample_rate = int(input_device_info["default_samplerate"])
     chunk_size = int(sample_rate / 10)  # 100ms
+
+    # 発話区間検出の設定
+    vad_config = VadConfig(threshold, vad_start, vad_end)
+
+    # マイク入力を初期化・開始
     mic_stream = MicrophoneStream(sample_rate, chunk_size, vad_config)
+
+    # 音声認識器を構築
     recognizer = KaldiRecognizer(Model("model"), sample_rate)
+
+    # マイク入力ストリームおよび音声認識器をまとめて保持
     VoskStreamingASR = namedtuple(
         "VoskStreamingASR", ["microphone_stream", "recognizer"]
     )
