@@ -192,6 +192,22 @@ def get_asr_result(vosk_asr):
         return None
 
 
+def get_vosk_recognizer():
+    """Return VOSK-based recognizer."""
+    SetLogLevel(-1)
+    vad_config = VadConfig()
+    input_device_info = sd.query_devices(kind="input")
+    sample_rate = int(input_device_info["default_samplerate"])
+    chunk_size = int(sample_rate / 10)  # 100ms
+    mic_stream = MicrophoneStream(sample_rate, chunk_size, vad_config)
+    recognizer = KaldiRecognizer(Model("model"), sample_rate)
+    VoskStreamingASR = namedtuple(
+        "VoskStreamingASR", ["microphone_stream", "recognizer"]
+    )
+    vosk_asr = VoskStreamingASR(mic_stream, recognizer)
+    return vosk_asr
+
+
 def main(chunk_size=8000, threshold=45, vad_start=0.3, vad_end=1.0):
     """音声認識デモンストレーションを実行.
 
