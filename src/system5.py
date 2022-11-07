@@ -46,7 +46,6 @@ def main():
     while True:
 
         # 音声認識入力を得る
-        # 音声認識入力を得る
         print("<<please speak>>")
         result_asr_utterance = get_asr_result(vosk_asr)
         print("ユーザ： " + result_asr_utterance)
