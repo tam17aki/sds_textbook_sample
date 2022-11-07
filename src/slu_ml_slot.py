@@ -32,14 +32,14 @@ def flat_classification_report(y_true, y_pred, labels=None, **kwargs):
     return metrics.classification_report(y_true, y_pred, labels=labels, **kwargs)
 
 
-def main():
+def main(domain=0):
     """main function.
     行数が長いので美しくないのですが、やむを得ない
     """
     # データを読み込む
 
     # 使用するドメインを設定する
-    USED_DATASET = 1  # 0: 'restaurant', 1: 'weather'
+    USED_DATASET = domain  # 0: 'restaurant', 1: 'weather'
 
     if USED_DATASET == 0:
         # レストランデータ
@@ -157,4 +157,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(0)
+    main(1)
