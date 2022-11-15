@@ -77,7 +77,7 @@ class SluRule(object):
         # 意味フレームの列挙
         place = "(京都|今出川|烏丸御池|百万遍)"
         genre = "(ラーメン|イタリアン|そば|中華|タイ料理)"
-        budget = "(1000|2000|3000)円"
+        budget = "(千|二千|三千)円"
         name = "(味亭|割烹井上)"
         time_open = "営業時間"
         time_from = "何時から"
